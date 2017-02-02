@@ -7,7 +7,7 @@
   </a>
 </p>
 
-<h1 align="center">minus</h1>
+<h1 align="center">minus-graphql</h1>
 <p align="center">Minimalist starter for isomorphic apps</p>
 
 - **No. Fucking. Bullshit.** Just the code.
