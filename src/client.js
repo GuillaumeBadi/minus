@@ -3,6 +3,8 @@ import { render } from 'react-dom'
 import { syncHistoryWithStore } from 'react-router-redux'
 import { trigger } from 'redial'
 import { Provider } from 'react-redux'
+import ApolloClient, { createBatchingNetworkInterface } from 'apollo-client'
+import { ApolloProvider } from 'react-apollo'
 import { Router, browserHistory, match } from 'react-router'
 
 import createStore from 'store'
@@ -10,7 +12,22 @@ import routes from 'routes'
 
 import 'styles/main.scss'
 
-const store = createStore(browserHistory, window.__INITIAL_STATE__)
+const networkInterface = createBatchingNetworkInterface({
+  uri: '/graphql',
+  batchInterval: 100,
+  opts: {
+    credentials: 'same-origin',
+  },
+})
+
+export const client = new ApolloClient({
+  dataIdFromObject: o => o.id,
+  initialState: window.__INITIAL_STATE__,
+  shouldBatch: true,
+  networkInterface,
+})
+
+const store = createStore(browserHistory, client, window.__INITIAL_STATE__)
 const history = syncHistoryWithStore(browserHistory, store)
 
 const matchRoutes = location =>
@@ -38,9 +55,9 @@ const matchRoutes = location =>
 history.listen(matchRoutes)
 
 const root = (
-  <Provider store={store}>
+  <ApolloProvider store={store} client={client}>
     <Router history={history} routes={routes} />
-  </Provider>
+  </ApolloProvider>
 )
 
 const rootNode = document.getElementById('root')
