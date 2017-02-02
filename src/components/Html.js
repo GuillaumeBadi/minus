@@ -8,6 +8,7 @@ const Html = ({ content, state, stats: { style, main = 'bundle.js' } }) => (
       <title>{'[::]'}</title>
 
       <meta charSet='utf-8' />
+      <meta name='viewport' content='width=device-width, user-scalable=no' />
       <link rel='icon' href='/assets/favicon.ico' type='image/x-icon' />
 
       {style && <link href={`/dist/${style}`} rel='stylesheet' />}

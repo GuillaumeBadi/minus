@@ -1,11 +1,12 @@
 import path from 'path'
 import React from 'react'
 import { trigger } from 'redial'
-import { Provider } from 'react-redux'
 import { Router, match, createMemoryHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import promisify from 'es6-promisify'
+import ApolloClient from 'apollo-client'
+import { ApolloProvider } from 'react-apollo'
 
 import config from 'config'
 import routes from 'routes'
@@ -25,8 +26,9 @@ async function render (req, res) {
     const { url } = req
     const memHistory = createMemoryHistory(url)
     const location = memHistory.createLocation(url)
+    const client = new ApolloClient()
 
-    const store = createStore(memHistory, {})
+    const store = createStore(memHistory, client, {})
     const history = syncHistoryWithStore(memHistory, store)
 
     const [redirectLocation, renderProps] = await matchRoutes({ routes, location })
@@ -48,9 +50,9 @@ async function render (req, res) {
     await trigger('fetch', components, locals)
 
     const root = (
-      <Provider store={store}>
+      <ApolloProvider store={store} client={client}>
         <Router history={history} routes={routes} />
-      </Provider>
+      </ApolloProvider>
     )
 
     const markup = renderToStaticMarkup(
